@@ -51,6 +51,7 @@ events.connect(events.SESSION_LOAD, function()
 		if buffer.filename and buffer.filename:sub(1, #scratch_dir) == scratch_dir then
 			os.remove(buffer.filename)
 			buffer.filename, buffer.tab_label = nil, _L['Untitled']
+			buffer:set_lexer('text') -- in case it was changed based on filename
 			events.emit(events.SAVE_POINT_LEFT) -- update titlebar/tabbar as necessary
 		end
 	end
