@@ -1,4 +1,4 @@
--- Copyright 2007-2023 Mitchell. See LICENSE.
+-- Copyright 2023 Mitchell. See LICENSE.
 
 --- Treat untitled buffers as scratch buffers.
 --
@@ -15,7 +15,8 @@ local M = {}
 
 --- The directory to temporarily save scratch files to.
 -- The default value is *~/.textadept/scratch/*.
-M.scratch_directory = _USERHOME .. (not WIN32 and '/' or '\\') .. 'scratch'
+M.scratch_directory = _USERHOME .. '/scratch'
+if WIN32 then M.scratch_directory = M.scratch_directory:gsub('/', '\\') end
 
 --- Returns the current scratch directory, creating it if necessary.
 local function get_scratch_directory()
