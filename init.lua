@@ -13,6 +13,10 @@
 -- @module scratch
 local M = {}
 
+--- Whether or not this module is enabled.
+-- The default value is true.
+M.enabled = true
+
 --- The directory to temporarily save scratch files to.
 -- The default value is *~/.textadept/scratch/*.
 M.scratch_directory = _USERHOME .. '/scratch'
@@ -29,7 +33,7 @@ end
 
 -- Save scratch buffers on exit.
 events.connect(events.QUIT, function()
-	if not textadept.session.save_on_quit then return end
+	if not M.enabled or not textadept.session.save_on_quit then return end
 	local scratch_dir = get_scratch_directory()
 	local i = 0
 	for _, buffer in ipairs(_BUFFERS) do
@@ -58,6 +62,7 @@ events.connect(events.SESSION_LOAD, function()
 end)
 
 -- Delete scratch buffers when they are closed.
+-- TODO: is this even needed? Scratch files are deleted on events.SESSION_LOAD.
 events.connect(events.BUFFER_DELETED, function(buffer)
 	local scratch_dir = get_scratch_directory()
 	if buffer.filename and buffer.filename:sub(1, #scratch_dir) == scratch_dir then

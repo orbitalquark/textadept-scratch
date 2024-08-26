@@ -13,6 +13,12 @@ Install this module by copying it into your *~/.textadept/modules/* directory or
 
 ## Fields defined by `scratch`
 
+<a id="scratch.enabled"></a>
+### `scratch.enabled` 
+
+Whether or not this module is enabled.
+The default value is true.
+
 <a id="scratch.scratch_directory"></a>
 ### `scratch.scratch_directory` 
 
