@@ -1,4 +1,4 @@
--- Copyright 2020-2024 Mitchell. See LICENSE.
+-- Copyright 2020-2025 Mitchell. See LICENSE.
 
 local scratch = require('scratch')
 scratch.enabled = false -- do not interfere with tests that expect default quit behavior
