@@ -1,7 +1,6 @@
 -- Copyright 2023-2025 Mitchell. See LICENSE.
 
 --- Treat untitled buffers as scratch buffers.
---
 -- Scratch buffers persist between sessions (e.g. closing and re-opening Textadept will re-open
 -- any scratch buffers) unless Textadept is in "no session" mode (the `-n` or `--no-session`
 -- flag was passed).
@@ -9,12 +8,14 @@
 -- Install this module by copying it into your *~/.textadept/modules/* directory or Textadept's
 -- *modules/* directory, and then putting the following in your *~/.textadept/init.lua*:
 --
---	require('scratch')
+-- ```lua
+-- local scratch = require('scratch')
+-- ```
 -- @module scratch
 local M = {}
 
---- Whether or not this module is enabled.
--- The default value is true.
+--- Enable this module.
+-- The default value is `true`.
 M.enabled = true
 
 --- The directory to temporarily save scratch files to.

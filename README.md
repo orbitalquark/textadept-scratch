@@ -9,21 +9,23 @@ flag was passed).
 Install this module by copying it into your *~/.textadept/modules/* directory or Textadept's
 *modules/* directory, and then putting the following in your *~/.textadept/init.lua*:
 
-	require('scratch')
-
-## Fields defined by `scratch`
+```lua
+local scratch = require('scratch')
+```
 
 <a id="scratch.enabled"></a>
-### `scratch.enabled` 
+## `scratch.enabled`
 
-Whether or not this module is enabled.
-The default value is true.
+Enable this module.
+
+The default value is `true`.
 
 <a id="scratch.scratch_directory"></a>
-### `scratch.scratch_directory` 
+## `scratch.scratch_directory`
 
 The directory to temporarily save scratch files to.
+
 The default value is *~/.textadept/scratch/*.
 
 
----
+
