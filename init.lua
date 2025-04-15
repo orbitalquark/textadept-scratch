@@ -1,6 +1,6 @@
 -- Copyright 2023-2025 Mitchell. See LICENSE.
 
---- Treat untitled buffers as scratch buffers.
+--- Treat untitled and typed buffers as scratch buffers.
 -- Scratch buffers persist between sessions (e.g. closing and re-opening Textadept will re-open
 -- any scratch buffers) unless Textadept is in "no session" mode (the `-n` or `--no-session`
 -- flag was passed).
@@ -38,12 +38,13 @@ events.connect(events.QUIT, function()
 	local scratch_dir = get_scratch_directory()
 	local i = 0
 	for _, buffer in ipairs(_BUFFERS) do
-		if buffer.filename or buffer._type or buffer.length == 0 then goto continue end
+		if buffer.filename or buffer.length == 0 then goto continue end
 		local filename
 		repeat
 			i = i + 1
 			filename = scratch_dir .. (not WIN32 and '/' or '\\') .. i
 		until not lfs.attributes(filename)
+		if buffer._type then buffer:insert_text(1, '::' .. buffer._type .. '::\n') end
 		buffer:save_as(filename)
 		::continue::
 	end
@@ -56,6 +57,14 @@ events.connect(events.SESSION_LOAD, function()
 		if buffer.filename and buffer.filename:sub(1, #scratch_dir) == scratch_dir then
 			os.remove(buffer.filename)
 			buffer.filename, buffer.tab_label = nil, _L['Untitled']
+			local _type, e = buffer:get_line(1):match('^::(.+)::\n()$')
+			if _type then
+				buffer._type = _type
+				buffer:delete_range(1, e - 1)
+				buffer:set_save_point()
+				buffer:empty_undo_buffer()
+				view.change_history = view.CHANGE_HISTORY_DISABLED -- make sure it's off
+			end
 			buffer:set_lexer('text') -- in case it was changed based on filename
 			events.emit(events.SAVE_POINT_LEFT) -- update titlebar/tabbar as necessary
 		end
