@@ -5,8 +5,6 @@ scratch.enabled = false -- do not interfere with tests that expect default quit 
 
 test('scratch buffers should save on quit', function()
 	local _<close> = test.mock(scratch, 'enabled', true)
-	local dir<close> = test.tmpdir()
-	local _<close> = test.mock(scratch, 'scratch_directory', dir.dirname)
 	local _<close> = test.mock(textadept.session, 'save_on_quit', true)
 	local text = test.lines{'scratch', ''}
 	buffer:append_text(text)
@@ -23,8 +21,6 @@ end)
 
 test('scratch buffers should include typed buffers', function()
 	local _<close> = test.mock(scratch, 'enabled', true)
-	local dir<close> = test.tmpdir()
-	local _<close> = test.mock(scratch, 'scratch_directory', dir.dirname)
 	local _<close> = test.mock(textadept.session, 'save_on_quit', true)
 	local text = 'print'
 	ui.print(text)
