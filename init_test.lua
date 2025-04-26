@@ -9,10 +9,10 @@ test('scratch buffers should save on quit', function()
 	local text = test.lines{'scratch', ''}
 	buffer:append_text(text)
 
-	events.emit(events.QUIT)
+	events.emit(events.QUIT) -- save default session
 	local closed = not buffer.modify
 
-	events.emit(events.SESSION_LOAD)
+	events.emit(events.ARG_NONE) -- load default session
 
 	test.assert_equal(closed, true)
 	test.assert_equal(buffer:get_text(), text)
@@ -25,10 +25,10 @@ test('scratch buffers should include typed buffers', function()
 	local text = 'print'
 	ui.print(text)
 
-	events.emit(events.QUIT)
+	events.emit(events.QUIT) -- save default session
 	local closed = not buffer.modify
 
-	events.emit(events.SESSION_LOAD)
+	events.emit(events.ARG_NONE) -- load default session
 
 	test.assert_equal(closed, true)
 	test.assert_equal(buffer._type, _L['[Output Buffer]'])
@@ -42,14 +42,14 @@ test('scratch buffers should save undo history', function()
 	local text = test.lines{'scratch', ''}
 	buffer:append_text(text)
 
-	events.emit(events.QUIT)
+	events.emit(events.QUIT) -- save default session
 	local closed = not buffer.modify
 
-	events.emit(events.SESSION_LOAD)
-	local can_undo = buffer:can_redo()
+	events.emit(events.ARG_NONE) -- load default session
+	local modify = buffer.modify
 	buffer:undo()
 
-	test.assert_equal(can_undo, true)
+	test.assert_equal(modify, true)
 	test.assert_equal(buffer:get_text(), '')
 end)
 
@@ -61,10 +61,10 @@ test('scratch buffers can be modified files', function()
 	local text = 'scratch'
 
 	buffer:append_text(text)
-	events.emit(events.QUIT)
+	events.emit(events.QUIT) -- save default session
 	local closed = not buffer.modify
 
-	events.emit(events.SESSION_LOAD)
+	events.emit(events.ARG_NONE) -- load default session
 
 	test.assert_equal(closed, true)
 	test.assert_equal(buffer.filename, f.filename)

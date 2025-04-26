@@ -88,51 +88,38 @@ events.connect(events.QUIT, function()
 	io.ensure_final_newline, textadept.editing.strip_trailing_spaces = newline, strip_spaces
 end, 1)
 
--- Reprocess scratch buffers after loading them from a session.
-events.connect(events.SESSION_LOAD, function()
+-- Restore a scratch buffer after loading it (most likely from a session).
+events.connect(events.FILE_OPENED, function(filename)
 	local scratch_dir = get_scratch_directory()
-	for _, buffer in ipairs(_BUFFERS) do
-		local filename = buffer.filename
-		if not filename or filename:sub(1, #scratch_dir) ~= scratch_dir then goto continue end
-		local metadata = filename .. '.dat'
-		if lfs.attributes(metadata) then
-			local data = assert(loadfile(metadata, 't', {}))()
+	if filename:sub(1, #scratch_dir) ~= scratch_dir then return end
+	local metadata = filename .. '.dat'
+	if lfs.attributes(metadata) then
+		local data = assert(loadfile(metadata, 't', {}))()
 
-			-- Restore buffer details (filename, typed, or Untitled) and lexer.
-			buffer.filename, buffer._type = data.filename, data._type
-			buffer:set_lexer(data.lexer)
+		-- Restore buffer details (filename, typed, or Untitled) and lexer.
+		buffer.filename, buffer._type = data.filename, data._type
+		buffer:set_lexer(data.lexer)
 
-			-- Restore undo history.
-			buffer.undo_collection = data.undo_collection
-			if buffer.undo_collection then
-				for i, action in ipairs(data.undo_actions) do
-					buffer:push_undo_action_type(action[1], action[2])
-					buffer:change_last_undo_action_text(action[3])
-				end
-				buffer.undo_save_point = data.undo_save
-				buffer.undo_current = data.undo_current
-				buffer.undo_tentative = data.undo_tentative
+		-- Restore undo history.
+		buffer.undo_collection = data.undo_collection
+		if buffer.undo_collection then
+			for i, action in ipairs(data.undo_actions) do
+				buffer:push_undo_action_type(action[1], action[2])
+				buffer:change_last_undo_action_text(action[3])
 			end
-
-			-- Update tab label.
-			local label = buffer.filename and buffer.filename:match('[^/\\]+$') or data._type or
-				_L['Untitled']
-			if buffer.modify then label = label .. '*' end
-			buffer.tab_label = label
-
-			-- If this is the current buffer, do some extra processing.
-			if buffer == _G.buffer then
-				if not buffer.filename then
-					view.change_history = view.change_history & view.CHANGE_HISTORY_DISABLED
-				end
-				events.emit(events.SAVE_POINT_LEFT) -- update titlebar
-			end
-
-			os.remove(metadata)
+			buffer.undo_save_point = data.undo_save
+			buffer.undo_current = data.undo_current
+			buffer.undo_tentative = data.undo_tentative
 		end
-		os.remove(filename)
-		::continue::
+
+		if not buffer.filename then
+			view.change_history = view.change_history & view.CHANGE_HISTORY_DISABLED
+		end
+		events.emit(events.SAVE_POINT_LEFT) -- update titlebar and tab label
+
+		os.remove(metadata)
 	end
+	os.remove(filename)
 end)
 
 return M
