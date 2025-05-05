@@ -103,7 +103,7 @@ events.connect(events.FILE_OPENED, function(filename)
 		-- Restore undo history.
 		buffer.undo_collection = data.undo_collection
 		if buffer.undo_collection then
-			for i, action in ipairs(data.undo_actions) do
+			for _, action in ipairs(data.undo_actions) do
 				buffer:push_undo_action_type(action[1], action[2])
 				buffer:change_last_undo_action_text(action[3])
 			end

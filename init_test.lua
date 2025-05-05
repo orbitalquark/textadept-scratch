@@ -43,8 +43,6 @@ test('scratch buffers should save undo history', function()
 	buffer:append_text(text)
 
 	events.emit(events.QUIT) -- save default session
-	local closed = not buffer.modify
-
 	events.emit(events.ARG_NONE) -- load default session
 	local modify = buffer.modify
 	buffer:undo()
