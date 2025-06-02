@@ -38,14 +38,25 @@ local function write_metadata(filename, buffer)
 	local data = {
 		filename = buffer.filename, _type = buffer._type, lexer = buffer.lexer_language,
 		undo_collection = buffer.undo_collection, undo_actions = {}, undo_save = buffer.undo_save_point,
-		undo_current = buffer.undo_current, undo_tentative = buffer.undo_tentative
+		undo_current = buffer.undo_current, undo_tentative = buffer.undo_tentative, indicators = {}
 	}
 	for i = 1, buffer.undo_actions do
 		local action_type = buffer.undo_action_type[i]
 		if action_type & 0xFF > 1 then goto continue end -- deletion is 0 and addition is 1
 		local pos, text = buffer.undo_action_position[i], buffer.undo_action_text[i]
-		table.insert(data.undo_actions, {action_type, pos, text})
+		table.insert(data.undo_actions, {action_type, pos, string.format('%q', text)})
 		::continue::
+	end
+	if buffer._type == _L['[Files Found Buffer]'] then
+		local find_indics = {}
+		data.indicators[ui.find.INDIC_FIND] = find_indics
+		local s = buffer:indicator_end(ui.find.INDIC_FIND, 1)
+		while true do
+			local e = buffer:indicator_end(ui.find.INDIC_FIND, s)
+			if e == 1 or e == s then break end
+			find_indics[#find_indics + 1], find_indics[#find_indics + 2] = s, e
+			s = buffer:indicator_end(ui.find.INDIC_FIND, e)
+		end
 	end
 
 	local f = assert(io.open(filename .. '.dat', 'wb'))
@@ -54,9 +65,15 @@ local function write_metadata(filename, buffer)
 		f:write(string.format('[%q]=', k))
 		if type(v) == 'string' then
 			f:write(string.format('%q,', v))
-		elseif type(v) == 'table' then -- undo actions
+		elseif type(v) == 'table' then
 			f:write('{')
-			for _, action in ipairs(v) do f:write(string.format('{%d,%d,%q},', table.unpack(action))) end
+			for k2, v2 in pairs(v) do
+				local key_fmt = type(k2) == 'number' and '[%d]' or '[%q]'
+				local value_fmt = type(v2) == 'table' and '{%s}' or '%s' -- TODO: write proper map
+				local fmt = string.format('%s=%s,', key_fmt, value_fmt)
+				v2 = type(v2) == 'table' and table.concat(v2, ',') or tostring(v2)
+				f:write(string.format(fmt, k2, v2))
+			end
 			f:write('},')
 		else
 			f:write(tostring(v), ',')
@@ -116,6 +133,14 @@ events.connect(events.FILE_OPENED, function(filename)
 			view.change_history = view.change_history & view.CHANGE_HISTORY_DISABLED
 		end
 		events.emit(events.SAVE_POINT_LEFT) -- update titlebar and tab label
+
+		-- Restore indicators.
+		for indic, ranges in pairs(data.indicators) do
+			buffer.indicator_current = indic
+			for i = 1, #ranges, 2 do
+				buffer:indicator_fill_range(ranges[i], ranges[i + 1] - ranges[i])
+			end
+		end
 
 		os.remove(metadata)
 	end

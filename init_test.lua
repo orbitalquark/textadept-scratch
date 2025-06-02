@@ -69,3 +69,20 @@ test('scratch buffers can be modified files', function()
 	test.assert_equal(buffer:get_text(), text)
 	test.assert_equal(buffer.modify, true)
 end)
+
+test('scratch buffers should save indicators', function()
+	local _<close> = test.mock(scratch, 'enabled', true)
+	local _<close> = test.mock(textadept.session, 'save_on_quit', true)
+	local find = 'find'
+
+	-- Simulate find in files results.
+	ui.print_to(_L['[Files Found Buffer]'], 'file.lua:1:' .. find)
+	buffer.indicator_current = ui.find.INDIC_FIND
+	buffer:indicator_fill_range(buffer.line_end_position[1] - #find, #find)
+
+	events.emit(events.QUIT) -- save default session
+	events.emit(events.ARG_NONE) -- load default session
+
+	local words = test.get_indicated_text(ui.find.INDIC_FIND)
+	test.assert_equal(words, {find})
+end)
