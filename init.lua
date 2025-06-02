@@ -135,7 +135,7 @@ events.connect(events.FILE_OPENED, function(filename)
 		events.emit(events.SAVE_POINT_LEFT) -- update titlebar and tab label
 
 		-- Restore indicators.
-		for indic, ranges in pairs(data.indicators) do
+		for indic, ranges in pairs(data.indicators or {}) do
 			buffer.indicator_current = indic
 			for i = 1, #ranges, 2 do
 				buffer:indicator_fill_range(ranges[i], ranges[i + 1] - ranges[i])
