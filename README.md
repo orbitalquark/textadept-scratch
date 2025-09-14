@@ -1,6 +1,6 @@
 # Scratch
 
-Treat untitled buffers as scratch buffers.
+Treat untitled, unsaved, and typed buffers as scratch buffers.
 
 Scratch buffers persist between sessions (e.g. closing and re-opening Textadept will re-open
 any scratch buffers) unless Textadept is in "no session" mode (the `-n` or `--no-session`
