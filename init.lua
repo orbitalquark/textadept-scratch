@@ -1,4 +1,4 @@
--- Copyright 2023-2025 Mitchell. See LICENSE.
+-- Copyright 2023-2026 Mitchell. See LICENSE.
 
 --- Treat untitled, unsaved, and typed buffers as scratch buffers.
 -- Scratch buffers persist between sessions (e.g. closing and re-opening Textadept will re-open
