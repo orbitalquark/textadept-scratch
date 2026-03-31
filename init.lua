@@ -144,4 +144,9 @@ events.connect(events.FILE_OPENED, function(filename)
 	os.remove(filename)
 end)
 
+-- Do not enable this module if a startup error occurs.
+local function disable() M.enabled = false end
+events.connect(events.ERROR, disable)
+events.connect(events.INITIALIZED, function() events.disconnect(events.ERROR, disable) end)
+
 return M
