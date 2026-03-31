@@ -129,9 +129,6 @@ events.connect(events.FILE_OPENED, function(filename)
 			buffer.undo_tentative = data.undo_tentative
 		end
 
-		if not buffer.filename then
-			view.change_history = view.change_history & view.CHANGE_HISTORY_DISABLED
-		end
 		events.emit(events.SAVE_POINT_LEFT) -- update titlebar and tab label
 
 		-- Restore indicators.
