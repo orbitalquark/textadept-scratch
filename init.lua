@@ -21,7 +21,7 @@ M.enabled = true
 --- The directory to temporarily save scratch files to.
 -- The default value is *~/.textadept/scratch/*.
 M.scratch_directory = _USERHOME .. '/scratch'
-if WIN32 then M.scratch_directory = M.scratch_directory:gsub('/', '\\') end
+if OS == 'windows' then M.scratch_directory = M.scratch_directory:gsub('/', '\\') end
 
 --- Returns the current scratch directory, creating it if necessary.
 local function get_scratch_directory()
@@ -95,7 +95,7 @@ events.connect(events.QUIT, function()
 		local filename
 		repeat
 			i = i + 1
-			filename = scratch_dir .. (not WIN32 and '/' or '\\') .. i
+			filename = scratch_dir .. (OS ~= 'windows' and '/' or '\\') .. i
 		until not lfs.attributes(filename)
 		write_metadata(filename, buffer)
 		buffer:save_as(filename)
